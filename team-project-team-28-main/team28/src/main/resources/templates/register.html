@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - Sludgate Brass Band</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" th:href="@{/css/style.css}"/>
+</head>
+<body>
+    <!-- Navbar -->
+    <div th:replace="~{fragments/navbar :: navbar}"></div>
+
+    <!-- Content Wrapper to center the register container -->
+    <div class="content-wrapper">
+        <div class="container register-container">
+            <h2 class="text-center">Register</h2>
+
+            <div th:if="${errorMessage}" class="alert alert-danger mt-3" th:text="${errorMessage}"></div>
+            <div th:if="${successMessage}" class="alert alert-success mt-3" th:text="${successMessage}"></div>
+
+            <form th:action="@{/auth/register}" method="post" th:object="${member}">
+                <div class="form-group">
+                    <label for="firstName">First Name</label>
+                    <input type="text" class="form-control" id="firstName" th:field="*{firstName}" required>
+                </div>
+                <div class="form-group">
+                    <label for="lastName">Last Name</label>
+                    <input type="text" class="form-control" id="lastName" th:field="*{lastName}" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" class="form-control" id="email" th:field="*{email}" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" class="form-control" id="password" th:field="*{password}" required>
+                    <div id="password-requirements" class="password-requirements hidden">
+                        <ul>
+                            <li id="length" class="invalid">Be at least 8 characters long</li>
+                            <li id="uppercase" class="invalid">Contain at least one uppercase letter</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="phone">Phone</label>
+                    <input type="text" class="form-control" id="phone" th:field="*{phone}">
+                </div>
+
+                <!-- Section to add a child account-->
+                <div class="form-group">
+                    <label for="addChildAccount">Add a child account?</label>
+                    <input type="checkbox" class="form-control" id="addChildAccount" th:field="*{addChild}">
+                </div>
+
+                <!-- Shown if checkbox is ticked -->
+                <div class="hidden" id="childAccountRegistration">
+                    <div class="form-group">
+                        <label for="childFirstName">Child's First Name:</label>
+                        <input type="text" class="form-control" id="childFirstName" th:field="*{childFirstName}">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="childLastName">Child's Last Name:</label>
+                        <input type="text" class="form-control" id="childLastName" th:field="*{childLastName}">
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-submit">Register</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div th:replace="~{fragments/footer :: footer}"></div>
+
+    <!-- Bootstrap JS, Popper.js, and jQuery -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <!-- Show and hide addChild section -->
+    <script th:src="@{/js/registrationFormJS.js}"></script>
+    
+    <!-- Password Requirements JS -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const passwordField = document.getElementById('password');
+            const passwordRequirements = document.getElementById('password-requirements');
+            const lengthRequirement = document.getElementById('length');
+            const uppercaseRequirement = document.getElementById('uppercase');
+
+            // Hide the requirements initially
+            passwordRequirements.classList.add('hidden');
+
+            // Show requirements when the user focuses on the password field
+            passwordField.addEventListener('focus', function () {
+                passwordRequirements.classList.remove('hidden');
+            });
+
+            // Check requirements as the user types
+            passwordField.addEventListener('input', function () {
+                const password = this.value;
+
+                // Check password length
+                if (password.length >= 8) {
+                    lengthRequirement.classList.remove('invalid');
+                    lengthRequirement.classList.add('valid');
+                } else {
+                    lengthRequirement.classList.remove('valid');
+                    lengthRequirement.classList.add('invalid');
+                }
+
+                // Check for uppercase letters
+                if (/[A-Z]/.test(password)) {
+                    uppercaseRequirement.classList.remove('invalid');
+                    uppercaseRequirement.classList.add('valid');
+                } else {
+                    uppercaseRequirement.classList.remove('valid');
+                    uppercaseRequirement.classList.add('invalid');
+                }
+            });
+
+            // Hide requirements when the user leaves the password field
+            passwordField.addEventListener('blur', function () {
+                if (!passwordField.value) {
+                    passwordRequirements.classList.add('hidden');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

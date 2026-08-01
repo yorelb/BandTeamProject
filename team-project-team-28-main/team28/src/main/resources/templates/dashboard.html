@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta charset="UTF-8" />
+        <meta
+                name="viewport"
+                content="width=device-width, initial-scale=1.0"
+        />
+        <title>Sludgate Brass Band</title>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"/>
+        <style>
+            .floating-buttons {
+                position: fixed;
+                padding-bottom: 65px;
+                bottom: 100px;
+                right: 20px;
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .floating-buttons button {
+                background-color: navy;
+                color: white;
+                border: none;
+                padding: 5px 15px;
+                border-radius: 5px;
+                font-size: 16px;
+                cursor: pointer;
+                box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+            }
+
+            .floating-buttons button:hover {
+                background-color: darkblue;
+            }
+
+
+
+            .floating-buttons button {
+                width: 150px;
+                height: 50px;
+            }
+
+                .modal-footer {
+                display: flex;
+                justify-content: space-between;
+            }
+
+            #deleteButton {
+                margin-right: auto;
+            }
+
+        </style>
+        <link
+                rel="stylesheet"
+                href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+        />
+        <link rel="stylesheet" th:href="@{/css/style.css}"/>
+        <link rel="stylesheet" th:href="@{/css/customContentWrapper.css}"/>
+        <link rel="stylesheet" th:href="@{/css/customBody.css}"/>
+
+    </head>
+    <body>
+
+    <div th:replace="~{fragments/navbar-for-logged-in-users}"></div>
+
+    <div class="content-wrapper">
+        <h2>Dashboard</h2>
+        <ul class="nav nav-tabs" id="myTab" role="tablist">
+            <li class="nav-item">
+                <a class="nav-link active" id="performance-tab" data-toggle="tab" href="#performance" role="tab" aria-controls="performance" aria-selected="true">Performance Schedule</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="loans-tab" data-toggle="tab" href="#loans" role="tab" aria-controls="loans" aria-selected="false">Loans</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="music-tab" data-toggle="tab" href="#music" role="tab" aria-controls="music" aria-selected="false">Music</a>
+            </li>
+        </ul>
+
+        <div class="tab-content mt-3" id="myTabContent">
+            <div class="tab-pane fade show active" id="performance" role="tabpanel" aria-labelledby="performance-tab">
+                <h3>Your Performances</h3>
+                <table class="table table-striped" id="participationTable">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Venue</th>
+                            <th>Date and Time</th>
+                            <th>Participating</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Rows will be dynamically added here -->
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="tab-pane fade" id="loans" role="tabpanel" aria-labelledby="loans-tab">
+                <h3>Loans</h3>
+                <table class="table table-bordered">
+                    <thead>
+                    <tr>
+                        <th>Loaned Instrument</th>
+                        <th>Loaned on</th>
+                        <th>Action</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="loan: ${memberLoans}">
+                        <td th:text="${loan.item.nameTypeOrTitle}"></td>
+                        <td th:text="${loan.loanDate}"></td>
+                        <td>
+                            <button class="btn btn-info"
+                                    th:data-itemName="${loan.item.nameTypeOrTitle}"
+                                    th:data-make="${loan.item.makeOrComposer}"
+                                    th:data-note="${loan.item.note}"
+                                    th:data-loanDate="${loan.loanDate}"
+                                    th:data-memberFirstName="${loan.member.firstName}"
+                                    th:data-memberLastName="${loan.member.lastName}"
+                                    onclick="showLoanDetails(this)"
+                                    data-toggle="modal"
+                                    data-target="#loanDetailsModal">Details</button>
+                        </td>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="modal fade" id="loanDetailsModal" tabindex="-1" role="dialog" aria-labelledby="loanDetailsModalLabel" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="loanDetailsModalLabel">Loan Item Details</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <p><strong>Instrument Name:</strong> <span id="modalInstrumentName"></span></p>
+                            <p><strong>Make:</strong> <span id="modalMake"></span></p>
+                            <p><strong>Note:</strong> <span id="modalNote"></span></p>
+                            <p><strong>Loaned to:</strong> <span id="modalMemberName"></span></p>
+                            <p><strong>Date of Loan:</strong> <span id="modalLoanDate"></span></p>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab-pane fade" id="music" role="tabpanel" aria-labelledby="music-tab">
+                <h3>Your Music</h3>
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Composer</th>
+                            <th>Arranger</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="music: ${musics}">
+                            <td th:text="${music.item.nameTypeOrTitle}"></td>
+                            <td th:text="${music.item.makeOrComposer}"></td>
+                            <td th:text="${music.arranger}"></td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <!-- Button to request music if you are a normal member -->
+                <button class="btn btn-primary" data-toggle="modal" data-target="#orderMusic">
+                    Order Music
+                </button>
+            </div>
+
+            <!-- Type modal with form to order music-->
+            <div class="modal fade" id="orderMusic" tabindex="-1" role="dialog"
+                 aria-labelledby="addMusic" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="orderMusicLabel">Order Music</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <form th:action="@{/orderMusic}" method="post">
+                            <!-- Insert dropdown with all music -->
+                            <div class="form-group">
+                                <label for="selectMusic">Select music piece:</label>
+                                <select id="selectMusic" name="itemId" required>
+                                    <option th:each="music : ${musics}"
+                                            th:value="${music.item.id}"
+                                            th:text="${music.arranger != null && !music.arranger.isEmpty()
+                                                        ? music.item.nameTypeOrTitle + ' - ' + music.item.makeOrComposer + ' - ' + music.arranger
+                                                        : music.item.nameTypeOrTitle + ' - ' + music.item.makeOrComposer}"></option>
+                                </select>
+                            </div>
+                            <!-- Add note section so user can add a note to their order -->
+                            <div class="form-group">
+                                <label for="noteSelectMusic">Add note:</label>
+                                <input type="text" name="note" id="noteSelectMusic">
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                <button type="submit" class="btn btn-primary">Save</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Buttons for Add Child, Child View, and Committee View -->
+        <div class="floating-buttons">
+            <button
+                    class="btn btn-info"
+                    th:onclick="'window.location.href=\'/allow-to-go-committee\';'"
+                    th:if="${memberType.equals('Committee') || memberType.equals('Director')}">
+                Committee View
+            </button>
+            <button
+                    class="btn btn-secondary"
+                    data-toggle="modal"
+                    data-target="#selectChildModal"
+                    th:if="${childNum >= 1}">
+                Child View
+            </button>
+            <button
+                    class="btn btn-primary"
+                    data-toggle="modal"
+                    data-target="#addChildModal">
+                Add Child
+            </button>
+        </div>
+
+        <!-- Add Child Modal -->
+        <div class="modal fade" id="addChildModal" tabindex="-1" role="dialog" aria-labelledby="addChildModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="addChildModalLabel">Add Child</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <form th:action="@{/addChild}" method="post">
+                        <div class="modal-body">
+                            <div class="form-group">
+                                <label for="firstName">First Name:</label>
+                                <input type="text" class="form-control" id="firstName" name="firstName" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="lastName">Last Name:</label>
+                                <input type="text" class="form-control" id="lastName" name="lastName" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="dateOfBirth">Date of Birth:</label>
+                                <input type="date" class="form-control" id="dateOfBirth" name="dateOfBirth" required>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary">Save</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!--Choose child modal-->
+        <div class="modal fade" id="selectChildModal" tabindex="-1" role="dialog" aria-labelledby="selectChildModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="selectChildModalLabel">Select a Child</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Select which child's view you want to see:</p>
+                        <ul>
+                            <li th:each="child : ${children}">
+                                <a th:href="@{/child/dashboard/{childMemberId}(childMemberId=${child.id})}" class="btn btn-link">
+                                    <span th:text="${child.firstName + ' ' + child.lastName}"></span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+            <div th:replace="~{fragments/footer :: footer}"></div>
+
+            <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+            <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+            <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+            <script th:src="@{js/editInstrument.js}"></script>
+            <script th:src="@{js/confirmDelete.js}"></script>
+            <script th:src="@{js/dashboardLoan.js}"></script>
+            <script src="/js/member-performance.js"></script>
+
+    </footer>
+
+
+    </body>
+</html>

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sludgate Brass Band</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
+    <link rel="stylesheet" th:href="@{/css/style.css}"/>
+    <link rel="stylesheet" th:href="@{/css/customContentWrapper.css}"/>
+    <link rel="stylesheet" th:href="@{/css/customBody.css}"/>
+</head>
+<body>
+
+<div th:replace="~{fragments/navbar-for-logged-in-users}"> </div>
+
+
+<div class="content-wrapper">
+    <h1>Approved changes</h1>
+    <table class="table">
+        <tr th:each="request: ${requests}">
+            <th>Director/Committee has approved account details changes to:</th>
+            <td th:text="${request.newFirstName}"></td>
+            <td th:text="${request.newLastName}"></td>
+            <td th:text="${request.newPhone}"></td>
+            <td th:text="${request.newEmail}"></td>
+            <td>
+                <div class="d-flex justify-content-around">
+                    <form th:action="@{/account/update/{id}(id=${request.id})}" method="post" onsubmit="return confirmProceed();">
+                        <button type="submit" class="btn btn-success">Click to proceed</button>
+                    </form>
+                    <form th:action="@{/request/discard/{id}(id=${request.id})}" method="post" onsubmit="return confirmDiscard();">
+                        <button type="submit" class="btn btn-danger">Discard</button>
+                    </form>
+                </div>
+            </td>
+        </tr>
+    </table>
+    <p th:if="${requests.isEmpty() || requests == null}">No approved changes here.</p>
+</div>
+
+<div th:replace="~{fragments/footer :: footer}"></div>
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script th:src="@{/js/approved-changes-functions.js}"></script>
+</body>
+</html>

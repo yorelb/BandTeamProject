@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Committee Dashboard</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .content-wrapper {
+            flex: 1;
+            padding: 20px 0;
+        }
+
+        .tab-content {
+            margin-top: 20px;
+        }
+
+        .modal-header {
+            background-color: #007bff;
+            color: white;
+        }
+
+        .floating-buttons {
+            position: fixed;
+            padding-bottom: 65px;
+            bottom: 100px;
+            right: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .floating-buttons button {
+            background-color: navy;
+            color: white;
+            border: none;
+            padding: 5px 15px;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+            width: 150px;
+            height: 50px;
+        }
+
+        .floating-buttons button:hover {
+            background-color: darkblue;
+        }
+
+
+    </style>
+</head>
+<body>
+
+    <!-- Content Wrapper -->
+    <div class="content-wrapper container mt-5">
+        <h1>Committee Dashboard</h1>
+        <p>Manage your committee tasks here.</p>
+
+        <!-- Tabs navigation -->
+        <ul class="nav nav-tabs" id="committeeTabs" role="tablist">
+            <li class="nav-item">
+                <a class="nav-link active" id="performance-tab" data-toggle="tab" href="#performance" role="tab" aria-controls="performance" aria-selected="true">Performance Schedule</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="items-tab" data-toggle="tab" href="#items" role="tab" aria-controls="items" aria-selected="false">Items</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="music-tab" data-toggle="tab" href="#music" role="tab" aria-controls="music" aria-selected="false">Music</a>
+            </li>
+        </ul>
+
+        <!-- Tabs content -->
+        <div class="tab-content">
+            <!-- Performance Schedule Tab -->
+            <div class="tab-pane fade show active" id="performance" role="tabpanel" aria-labelledby="performance-tab">
+                <h3>Performance Schedule</h3>
+                <button class="btn btn-primary mb-3" onclick="showCreatePerformanceForm()">Create Performance</button>
+                <table class="table table-striped" id="performanceTable">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Venue</th>
+                            <th>Date and Time</th>
+                            <th>Band</th>
+                            <th>Playlist</th>
+                            <th>View Participants</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+
+                    </tbody>
+                </table>
+
+                <!-- Modal for Player Details -->
+                <div class="modal fade" id="performanceModal" tabindex="-1" role="dialog" aria-labelledby="performanceModalLabel" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="performanceModalLabel">Members</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <ul id="playerList" class="list-group"></ul>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <!-- Create Performance Form -->
+                <div id="createPerformanceForm" class="card p-3 mt-3" style="display: none;">
+                    <h5>Create New Performance</h5>
+                    <form id="performanceForm">
+                        <div class="form-group">
+                            <label for="name">Performance Name</label>
+                            <input type="text" id="name" name="name" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="venue">Venue</label>
+                            <input type="text" id="venue" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="dateTime">Date and Time</label>
+                            <input type="datetime-local" id="dateTime" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Band</label><br>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="band" id="trainingBand" value="Training">
+                                <label class="form-check-label" for="trainingBand">Training Band</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="band" id="seniorBand" value="Senior">
+                                <label class="form-check-label" for="seniorBand">Senior Band</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="band" id="bothBands" value="Both">
+                                <label class="form-check-label" for="bothBands">Both Bands</label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="playlist">Select Music for Playlist</label>
+                            <select id="playlist" name="playlist" class="form-control" multiple>
+
+                            </select>
+                            <small class="form-text text-muted">Hold Ctrl (Windows) or Command (Mac) to select multiple items.</small>
+                        </div>
+
+                        <button type="button" class="btn btn-success" onclick="submitPerformance()">Save Performance</button>
+                        <button type="button" class="btn btn-secondary" onclick="hideCreatePerformanceForm()">Cancel</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- committee items Tab -->
+            <div class="tab-pane fade" id="items" role="tabpanel" aria-labelledby="items-tab">
+                <table class="table table-bordered">
+                    <thead>
+                    <tr>
+                        <th>Instrument</th>
+                        <th>Make</th>
+                        <th>Serial Number</th>
+                        <th>In Storage</th>
+                        <th>Note</th>
+                        <th>Edit</th>
+                        <th>Loan/Return</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="instrument: ${instruments}">
+                        <td th:text="${instrument.item.nameTypeOrTitle}"></td>
+                        <td th:text="${instrument.item.makeOrComposer}"></td>
+                        <td th:text="${instrument.serialNumber}"></td>
+                        <td>
+                            <span th:if="${instrument.item?.inStorage}" class="badge badge-success">Yes</span>
+                            <span th:if="${!instrument.item?.inStorage}" class="badge badge-danger">No</span>
+                        </td>
+                        <td th:text="${instrument.item.note}"></td>
+                        <td>
+                            <button class="btn btn-primary"
+                                    data-toggle="modal"
+                                    data-target="#editInstrumentModal"
+                                    th:if="${instrument.item.inStorage}"
+                                    th:attr="data-id=${instrument.id}, data-inStorage=${instrument.item.inStorage}"
+                                    onclick="populateEditForm(this)"> Edit </button>
+
+                            <!-- Stops editing while item is on loan -->
+                            <span th:if="${!instrument.item.inStorage}" class="text-danger">
+                                On loan
+                            </span>
+                        </td>
+                        <td>
+                            <button class="btn btn-primary"
+                                    th:if="${instrument.item.inStorage}"
+                                    data-toggle="modal"
+                                    data-target="#loanModal"
+                                    th:attr="data-id=${instrument.id}"
+                                    data-action="loan"
+                                    onclick="setAction(this)">Loan</button>
+                            <button class="btn btn-warning"
+                                    th:if="${!instrument.item.inStorage}"
+                                    data-toggle="modal"
+                                    data-target="#returnModal"
+                                    th:attr="data-id=${instrument.id}"
+                                    data-action="return"
+                                    onclick="setAction(this)">Return</button>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+
+
+                <button class="btn btn-primary" data-toggle="modal" data-target="#addInstrument">
+                    Add Instrument</button>
+
+                <!-- Loan modal -->
+                <div class="modal fade" id="loanModal" tabindex="-1" role="dialog" aria-labelledby="loanModalLabel" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="loanModalLabel">Loan Instrument</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <form th:action="@{/loans/loanAction}" id="loanRequestDto" method="post">
+                                <div class="modal-body">
+                                    <input type="hidden" id="loanInstrumentId" name="instrumentId">
+                                    <input type="hidden" id="loanAction" name="action">
+                                    <div class="form-group">
+                                        <label for="memberName">Member Full Name:</label>
+                                        <input type="text" class="form-control" id="memberName" name="memberName" required>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                    <button type="submit" class="btn btn-primary">Submit</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Return Modal -->
+                <div class="modal fade" id="returnModal" tabindex="-1" role="dialog" aria-labelledby="returnModalLabel" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="returnModalLabel">Return Instrument</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <form th:action="@{/loans/loanAction}" id="returnForm" method="post">
+                                <div class="modal-body">
+                                    <input type="hidden" id="returnInstrumentId" name="instrumentId">
+                                    <input type="hidden" id="returnAction" name="action">
+                                    <p>Are you sure you want to return this instrument?</p>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                    <button type="submit" class="btn btn-warning">Return</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Type modal with form to add instrument-->
+                <div class="modal fade" id="addInstrument" tabindex="-1" role="dialog"
+                     aria-labelledby="addInstrument" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="addInstrumentLabel">Add Instrument</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <form th:action="@{/addInstrument}" method="post">
+                                <div class="modal-body">
+                                    <div class="form-group" >
+                                        <label for="instrumentInput">Instrument:</label>
+                                        <input type="text" class="form-control" id="instrumentInput" name="instrumentInput" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="make">Make:</label>
+                                        <input type="text" class="form-control" id="make" name="make" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="serialNumber">Serial Number:</label>
+                                        <input type="text" class="form-control" id="serialNumber" name="serialNumber" required>
+                                    </div>
+                                    <input type="hidden" name="inStorage" value = "true">
+                                    <div class="form-group">
+                                        <label for="note">Note:</label>
+                                        <input type="text" class="form-control" id="note" name="note">
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                    <button type="submit" class="btn btn-primary">Save</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Type modal to edit or delete instrument -->
+                <div class="modal fade" id="editInstrumentModal" tabindex="-1" role="dialog" aria-labelledby="editInstrumentModalLabel" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="editInstrumentModalLabel">Edit Instrument</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <form th:action="@{/editInstrument}" method="post">
+                                <div class="modal-body">
+                                    <input type="hidden" id="editInstrumentId" name="instrumentId"/>
+                                    <div class="form-group">
+                                        <label for="editInstrumentInput">Instrument:</label>
+                                        <input type="text" class="form-control" id="editInstrumentInput" name="instrumentInput" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="editMake">Make:</label>
+                                        <input type="text" class="form-control" id="editMake" name="make" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="editSerialNumber">Serial Number:</label>
+                                        <input type="text" class="form-control" id="editSerialNumber" name="serialNumber" required>
+                                    </div>
+                                    <input type="hidden" name="inStorage" id="editInStorage">
+                                    <div class="form-group">
+                                        <label for="editNote">Note:</label>
+                                        <input type="text" class="form-control" id="editNote" name="note">
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                    <button type="submit" class="btn btn-primary">Save</button>
+                                </div>
+                            </form>
+                            <!-- Button to delete an Instrument -->
+                            <form id="deleteForm" th:action="@{/deleteInstrument}" method="post" style="display: inline;">
+                                <input type="hidden" name="instrumentId" id="deleteInstrumentId" />
+                                <button type="button" class="btn btn-danger" id="deleteButton" onclick="confirmDelete()">
+                                    Delete
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <!--Miscellaneous Item Table displayed with its buttons(buttons dont work yet)-->
+                <h3>Miscellaneous Items</h3>
+                <table class="table table-bordered">
+                    <thead>
+                    <tr>
+                        <th>Item Name</th>
+                        <th>Make</th>
+                        <th>In Storage</th>
+                        <th>Action</th>
+                        <th>Quantity</th>
+                        <th>Loan</th>
+                        <th>Return</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="misc : ${miscs}">
+                        <td th:text="${misc.miscItem.nameTypeOrTitle}"></td>
+                        <td th:text="${misc.miscItem.makeOrComposer}"></td>
+                        <td>
+                            <span th:if="${misc.miscItem?.inStorage}" class="badge badge-success">Yes</span>
+                            <span th:if="${!misc.miscItem?.inStorage}" class="badge badge-danger">No</span>
+                        </td>
+
+                        <td>
+                        <button class="btn btn-primary"
+                                data-toggle="modal"
+                                data-target="#editMiscModal"
+                                th:attr="data-id=${misc.id},data-name=${misc.miscItem.nameTypeOrTitle},data-make=${misc.miscItem.makeOrComposer},data-quantity=${misc.miscQuantity}"
+
+                                onclick="populateMiscEditForm(this)"> Edit </button>
+                        </td>
+                        <td th:text="${misc.miscQuantity}"></td>
+                        <td>
+                            <button class="btn btn-primary"
+                                    data-toggle="modal"
+                                    data-target="#miscLoanModal"
+                                    th:attr="data-id=${misc.id}"
+                                    data-itemType ="misc"
+                                    data-action="miscLoan"
+                                    onclick="setAction(this)">Loan</button>
+                        </td>
+                        <td>
+                            <button class="btn btn-warning"
+                                    data-toggle="modal"
+                                    data-target="#miscReturnModal"
+                                    th:attr="data-id=${misc.id}"
+                                    data-action="miscReturn"
+                                    onclick="setAction(this)">Return</button>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+                <button class="btn btn-primary" data-toggle="modal" data-target="#addMisc">
+                    Add Miscellaneous Items</button>
+
+                <div class="modal fade" id="addMisc" tabindex="-1" role="dialog"
+                     aria-labelledby="addMisc" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="addMiscLabel">Add Miscellaneous Items</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <form th:action="@{/addMisc}" method="post">
+                                <div class="modal-body">
+                                    <div class="form-group" >
+                                        <label for="miscName">Item Name:</label>
+                                        <input type="text" class="form-control" id="miscName" name="miscName" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="miscMake">Make:</label>
+                                        <input type="text" class="form-control" id="miscMake" name="miscMake" required>
+                                    </div>
+                                    <div class="form-group" >
+                                        <label for="miscQuantity">Quantity</label>
+                                        <input type="number" class="form-control" id="miscQuantity" name="miscQuantity" required>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="miscSerialNumber">Serial Number:</label>
+                                        <input type="text" class="form-control" id="miscSerialNumber" name="miscSerialNumber" required>
+                                    </div>
+                                    <input type="hidden" name="inStorage" value = "true">
+                                    <div class="form-group">
+                                        <label for="miscNote">Note:</label>
+                                        <input type="text" class="form-control" id="miscNote" name="miscNote">
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                    <button type="submit" class="btn btn-primary">Save</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+
+
+
+
+            </div>
+
+
+
+            <!-- Music Tab -->
+            <div class="tab-pane fade" id="music" role="tabpanel" aria-labelledby="music-tab">
+                <h3><span th:unless="${memberType.equals('Committee')} or ${memberType.equals('Director')}">Your </span>Music</h3>
+                <table class="table table-bordered">
+                    <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Composer</th>
+                        <th>Arranger</th>
+                        <th th:if="${memberType.equals('Committee')} or ${memberType.equals('Director')}">
+                            Band practicing</th>
+                        <th th:if="${memberType.equals('Committee')} or ${memberType.equals('Director')}">
+                            Suitable for training band?</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="music: ${musics}">
+                        <td th:text="${music.item.nameTypeOrTitle}"></td>
+                        <td th:text="${music.item.makeOrComposer}"></td>
+                        <td th:text="${music.arranger}"></td>
+                        <td th:if="${memberType.equals('Committee')} or ${memberType.equals('Director')}"
+                            th:text="${music.bandInPractice.toString()}"></td>
+                        <td th:if="${memberType.equals('Committee')} or ${memberType.equals('Director')}"
+                            th:text="${music.item.note == 'true' ? 'True' : 'False'}"></td>
+                    </tr>
+                    </tbody>
+                </table>
+                <!-- Button to add music and to see order requests-->
+                <span th:if="${memberType.equals('Committee')} or ${memberType.equals('Director')}">
+                        <button class="btn btn-primary" data-toggle="modal" data-target="#addMusic">
+                            Add Music</button>
+                        <button class="btn btn-primary" data-toggle="modal" data-target="#viewOrders">
+                            View Orders</button>
+                    </span>
+                <!-- Type modal with form to add music-->
+                <div class="modal fade" id="addMusic" tabindex="-1" role="dialog"
+                     aria-labelledby="addMusic" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="addMusicLabel">Add Music</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <form th:action="@{/addMusic}" method="post">
+                                <div class="modal-body">
+                                    <div class="form-group" >
+                                        <label for="musicInput">Name:</label>
+                                        <input type="text" class="form-control" id="musicInput" name="musicInput" required >
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="composer">Composer:</label>
+                                        <input type="text" class="form-control" id="composer" name="composer" required >
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="arranger">Arranger:</label>
+                                        <input type="text" class="form-control" id="arranger" name="arranger">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="bandInPractice">Band practicing:</label>
+                                        <select id="bandInPractice" name="bandInPractice" required>
+                                            <option th:each="band : ${T(uk.ac.sheffield.team28.team28.model.BandInPractice).values()}"
+                                                    th:value="${band}"
+                                                    th:text="${band.toString() != null ? band.toString() : band.toString()}"></option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Is this suitable for the Training Band?</label>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="suitableForTraining" id="suitableForTrainingYes" value="true" checked>
+                                            <label class="form-check-label" for="suitableForTrainingYes">Yes</label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="suitableForTraining" id="suitableForTrainingNo" value="false">
+                                            <label class="form-check-label" for="suitableForTrainingNo">No</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                    <button type="submit" class="btn btn-primary">Save</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Type modal with form to view music orders-->
+                <div class="modal fade" id="viewOrders" tabindex="-1" role="dialog"
+                     aria-labelledby="viewOrders" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="viewOrderLabel">View orders</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <form th:action="@{/orders/changeOrderStatus}" method="post">
+                                <!-- Table that shows all music orders that are not fulfilled -->
+                                <table id="orderTable" class="table table-bordered">
+                                    <thead>
+                                    <tr>
+                                        <th>Select</th>
+                                        <th>Name</th>
+                                        <th>Composer</th>
+                                        <th>Arranger</th>
+                                        <th>Note</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr th:each="musicOrder : ${musicOrders}">
+                                        <td>
+                                            <input type="radio" name="orderId" th:value="${musicOrder.id}">
+                                        </td>
+                                        <td th:text="${musicOrder.item.nameTypeOrTitle}"></td>
+                                        <td th:text="${musicOrder.item.makeOrComposer}"></td>
+                                        <td th:text="${orderService.getArrangerForOrder(musicOrder.id)}"></td>
+                                        <td th:text="${musicOrder.note}"></td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                    <button type="submit" class="btn btn-primary">Fulfill Order</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+
+        </div>
+
+
+    </div>
+
+    <div class="floating-buttons">
+
+        <button
+                class="btn btn-info"
+                th:onclick="'window.location.href=\'/committee/allow-to-go-to-director\';'"
+                th:if="${memberType.equals('Director')}">
+            Director View
+        </button>
+        <button
+                class="btn btn-info"
+                th:onclick="'window.location.href=\'/dashboard\';'"
+                th:if="${memberType.equals('Committee') || memberType.equals('Director')}">
+            Return to Adult View
+        </button>
+
+
+    </div>
+
+    <footer>
+        <div th:replace="~{fragments/footer :: footer}"></div>
+
+        <script th:src="@{../js/editInstrument.js}"></script>
+        <script th:src="@{../js/confirmDelete.js}"></script>
+        <script th:src="@{../js/dashboardLoan.js}"></script>
+
+        <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+        <script src="/js/performance.js"></script>
+    </footer>
+</body>
+</html>

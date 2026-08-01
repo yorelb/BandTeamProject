@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Director</title>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+        <link rel="stylesheet" th:href="@{/css/h2AndNavStyle.css}"/>
+        <style>
+            html, body {
+                height: 100%;
+                margin: 0;
+                display: flex;
+                flex-direction: column;
+            }
+
+            .content-wrapper {
+                padding-top: 60px;
+                flex: 1;
+                display: flex;
+                text-align: center;
+                flex-direction: column;
+                justify-content: flex-start;
+                align-items: center;
+            }
+
+            .content-wrapper {
+                flex: 1;
+                padding: 20px 0;
+            }
+
+            .tab-content {
+                margin-top: 20px;
+            }
+
+            .modal-header {
+                background-color: #007bff;
+                color: white;
+            }
+
+            .floating-buttons {
+                position: fixed;
+                padding-bottom: 65px;
+                bottom: 100px;
+                right: 20px;
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .floating-buttons button {
+                background-color: navy; /* Changes the button color to navy */
+                color: white; /* Ensures the text is readable */
+                border: none; /* Optional: removes any border */
+                padding: 5px 15px; /* Adjusts padding for better appearance */
+                border-radius: 5px; /* Adds rounded corners */
+                font-size: 16px; /* Sets a readable font size */
+                cursor: pointer; /* Changes cursor to pointer on hover */
+                box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Optional: adds a slight shadow */
+                width: 150px;
+                height: 50px;
+            }
+
+            .floating-buttons button:hover {
+                background-color: darkblue; /* Changes to a slightly darker navy on hover */
+            }
+
+        </style>
+    </head>
+    <body>
+
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <a class="navbar-brand ml-3" th:href="@{/director}">Sludgate Brass Band</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+    </nav>
+
+            <div class="container">
+                <h2>Director</h2>
+
+                <div th:if="${errorMessage}" class="alert alert-anger" th:text="${errorMessage}"></div>
+                <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
+
+                <ul class="nav nav-tabs" id="directorTabs" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/director/committee}">Committee</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/director/trainingBand}">Training Band</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/director/seniorBand}">Senior Band</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/director/parents}" >Parents</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/director/allMembers}" >All members</a>
+                    </li>
+                </ul>
+            </div>
+
+    <div class="floating-buttons">
+
+        <button
+                class="btn btn-info"
+                th:onclick="'window.location.href=\'/committee/dashboard\';'"
+                th:if="${memberType.equals('Director')}">
+            Return to Committee View
+        </button>
+
+    </div>
+
+
+            <div th:replace="~{fragments/footer :: footer}"></div>
+
+            <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+            <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+            <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    </body>
+</html>

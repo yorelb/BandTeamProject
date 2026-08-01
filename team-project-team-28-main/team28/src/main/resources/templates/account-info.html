@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Account Information</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
+    <link rel="stylesheet" th:href="@{/css/style.css}" />
+    <link rel="stylesheet" th:href="@{/css/customContentWrapper.css}" />
+    <link rel="stylesheet" th:href="@{/css/customBody.css}" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
+    <link rel="stylesheet" th:href="@{/css/style.css}" />
+    <link rel="stylesheet" th:href="@{/css/customContentWrapper.css}" />
+    <link rel="stylesheet" th:href="@{/css/customBody.css}" />
+</head>
+<body>
+
+<div th:replace="~{fragments/navbar-for-logged-in-users}"> </div>
+
+
+<div class="content-wrapper">
+    <div id="viewDetails">
+        <h1>Account Information</h1>
+
+        <div th:if="${hasBeenRequested==true}" class="alert alert-success mt-3">Your request to change your credentials has been successfully been sent to the director</div>
+        <div th:if="${success != null && success==true}" class="alert alert-success mt-3">Successfully has been updated</div>
+        <div th:if="${success != null && success==false}" class="alert alert-danger mt-3">Partially has been updated</div>
+        <div th:if="${errors != null}">
+            <div th:each="error : ${errors}" class="alert alert-danger mt-3" th:text="${error}"></div>
+        </div>
+
+        <p><strong>Email:</strong> <span th:text="${member.email}"></span></p>
+        <p><strong>First Name:</strong> <span th:text="${member.firstName}"></span></p>
+        <p><strong>Last Name:</strong> <span th:text="${member.lastName}"></span></p>
+        <p><strong>Phone:</strong> <span th:text="${member.phone}"></span></p>
+
+        <!-- if hasBeenAccepted is true then button should be clicked to proceed and above it should show what's -->
+        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#editModal">
+            Request Account Information Change
+        </button>
+
+        <!-- Delete Member Button -->
+        <div th:if="${member.memberType != 'DIRECTOR'}">
+            <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#confirmDeleteModal">
+                Delete Member
+            </button>
+        </div>
+        <!-- Confirmation Modal for Member Deletion -->
+        <div class="modal fade" id="confirmDeleteModal" tabindex="-1" role="dialog" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="confirmDeleteModalLabel">Confirm Deletion</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        Are you sure you want to delete this member? This action cannot be undone.
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                        <form th:action="@{/director/removeMember/{memberId}(memberId=${member.id})}" method="post">
+                            <input type="hidden" name="redirectTo" value="/auth/login" />
+                            <button type="submit" class="btn btn-danger">Delete</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Success/Error Alerts -->
+        <div th:if="${param.error}" class="alert alert-danger alert-dismissible fade show mt-3" role="alert">
+            Error: Unable to delete the member due to active loans.
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <div th:if="${param.success}" class="alert alert-success alert-dismissible fade show mt-3" role="alert">
+            Success: Member deleted successfully.
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+
+            <!-- Children Section -->
+        <div th:if="${children.size() > 0}">
+            <h3>Children</h3>
+            <div th:each="child : ${children}">
+                <div class="child-details">
+                    <p><strong>Child First Name:</strong> <span th:text="${child.firstName}"></span></p>
+                    <p><strong>Child Last Name:</strong> <span th:text="${child.lastName}"></span></p>
+                    <!-- Delete Button for Child -->
+                    <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#confirmDeleteChildModal" th:data-child-id="${child.id}">
+                        Delete Child
+                    </button>
+
+                    <!-- Confirmation Modal for Child Deletion -->
+                    <div class="modal fade" id="confirmDeleteChildModal" tabindex="-1" role="dialog" aria-labelledby="confirmDeleteChildModalLabel" aria-hidden="true">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="confirmDeleteChildModalLabel">Confirm Child Deletion</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    Are you sure you want to delete this child? This action cannot be undone.
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                                    <form th:action="@{/director/removeChildMember/{childMemberId}(childMemberId=${child.id})}" method="post">
+                                        <input type="hidden" name="redirectTo" value="/dashboard" />
+                                        <button type="submit" class="btn btn-danger">Delete</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Success/Error Alerts -->
+            <div th:if="${param.error}" class="alert alert-danger alert-dismissible fade show mt-3" role="alert">
+                Error: Unable to delete the member due to active loans.
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Modal -->
+    <div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editModalLabel">Edit Account Details</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form th:if="${isAuthorised}" th:action="@{/account/request-update}" method="post">
+                        <label for="email">Email:</label>
+                        <input type="email" name="email" id="email" th:value="${member.email}" /><br>
+
+                        <label for="firstName">First Name:</label>
+                        <input type="text" id="firstName" name="firstName" th:value="${member.firstName}" /><br>
+
+                        <label for="lastName">Last Name:</label>
+                        <input type="text" id="lastName" name="lastName" th:value="${member.lastName}" /><br>
+
+                        <label for="phone">Phone:</label>
+                        <input type="text" id="phone" name="phone" th:value="${member.phone}" /><br>
+
+                        <button type="submit" class="btn btn-success">Request Changes</button>
+                    </form>
+
+                    <form th:if="${isAuthorised == null || !isAuthorised}" th:action="@{/account/request-update}" method="post">
+                        <p><strong>Email:</strong> <span th:text="${member.email}"></span></p>
+                        <p><strong>First Name:</strong> <span th:text="${member.firstName}"></span></p>
+                        <p><strong>Last Name:</strong> <span th:text="${member.lastName}"></span></p>
+                        <p><strong>Phone:</strong> <span th:text="${member.phone}"></span></p>
+
+                        <button type="submit" class="btn btn-success">Authorise yourself before requesting changes</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div th:replace="~{fragments/footer :: footer}" />
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Senior Band</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" th:href="@{/css/style.css}"/>
+
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+    <a class="navbar-brand ml-3" th:href="@{/director}">Sludgate Brass Band</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+</nav>
+
+
+<div th:if="${param.error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+    Error: This member does not exist
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+<div th:if="${param.success}" class="alert alert-success alert-dismissible fade show" role="alert">
+    Success: Member added to senior band.
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+
+<div th:if="${param.errorR}" class="alert alert-danger alert-dismissible fade show" role="alert">
+    Error: Member has not been removed from senior band
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+<div th:if="${param.successR}" class="alert alert-success alert-dismissible fade show" role="alert">
+    Success: Member has been removed from senior band
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+<div class="container mt-4">
+    <h2 class="text-center mb-4">Add Member to Senior Band</h2>
+
+    <form th:action="@{/director/addToBandByEmail}" method="post" class="mb-4">
+        <div class="form-group">
+            <label for="email">Add Member by Email:</label>
+            <input type="email" id="email" name="email" class="form-control" placeholder="Enter member email" required>
+        </div>
+        <input type="hidden" name="band" value="Senior">
+        <button type="submit" class="btn btn-primary">Add to Senior Band</button>
+    </form>
+
+
+    <h2 class="text-center mb-4">Senior Band Members</h2>
+    <table class="table table-bordered">
+        <thead>
+        <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Phone</th>
+            <th>Band</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="member : ${seniorBandMembers}">
+            <td th:text="${member.firstName} + ' ' + ${member.lastName}">Name</td>
+            <td th:text="${member.email}">Email</td>
+            <td th:text="${member.phone}">Phone</td>
+            <td th:text="${member.band}">Band</td>
+            <td>
+                <form th:action="@{/director/removeFromBand/{memberId}/{oldBand}(memberId=${member.id}, oldBand='Senior')}" method="post">
+                    <button type="submit" class="btn btn-danger btn-sm">Remove</button>
+                </form>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+    <h2 class="text-center mt-5 mb-4">Non Members</h2>
+    <table class="table table-bordered">
+        <thead>
+        <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Phone</th>
+            <th>Band</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="member : ${nonBandMembers}">
+            <td th:text="${member.firstName} + ' ' + ${member.lastName}">Name</td>
+            <td th:text="${member.email}">Email</td>
+            <td th:text="${member.phone}">Phone</td>
+            <td th:text="${member.band}">Band</td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+
+<div>
+    <button class="back-button">
+        <a class="back-button" th:href="@{/director}">Go Back</a>
+    </button>
+</div>
+
+<div th:replace="~{fragments/footer :: footer}"></div>
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script th:src="@{/js/general.js}"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+</body>
+</html>
