@@ -17,7 +17,7 @@ The Band Management System is a full-stack enterprise application designed to st
 *   **Testing:** JUnit, Mockito (Test-Driven Development approach)
 *   **Build Tool:** Gradle
 
-## 📂 Architecture & Project Structure
+## Architecture & Project Structure
 The application strictly adheres to the **Model-View-Controller (MVC)** architectural pattern to ensure separation of concerns and maintainability:
 *   `controller/` - REST endpoints and web request handlers routing data to Thymeleaf views.
 *   `service/` - Core business logic, transaction management, and data processing.
